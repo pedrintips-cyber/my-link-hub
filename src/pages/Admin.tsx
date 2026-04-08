@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -10,8 +10,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { LogOut, Eye, Image, Settings, Upload } from "lucide-react";
+import { LogOut, Eye, Image, Settings, Upload, Save } from "lucide-react";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -30,6 +32,7 @@ const Admin = () => {
   // Banners state
   const [banners, setBanners] = useState<any[]>([]);
   const [bannersLoading, setBannersLoading] = useState(true);
+  const [bannerSaving, setBannerSaving] = useState<string | null>(null);
 
   // Views state
   const [viewsToday, setViewsToday] = useState(0);
@@ -49,18 +52,17 @@ const Admin = () => {
     }
   }, [settings]);
 
-  // Load banners (all, not just active, for admin)
-  useEffect(() => {
+  const loadBanners = useCallback(async () => {
     if (!isAdmin) return;
-    supabase
+    const { data, error } = await supabase
       .from("banners")
       .select("*")
-      .order("position", { ascending: true })
-      .then(({ data }) => {
-        setBanners(data || []);
-        setBannersLoading(false);
-      });
+      .order("position", { ascending: true });
+    if (!error) setBanners(data || []);
+    setBannersLoading(false);
   }, [isAdmin]);
+
+  useEffect(() => { loadBanners(); }, [loadBanners]);
 
   // Load views
   useEffect(() => {
@@ -92,7 +94,7 @@ const Admin = () => {
         whatsapp_url: whatsappUrl,
       })
       .eq("id", settings.id);
-    if (error) toast.error("Erro ao salvar");
+    if (error) toast.error("Erro ao salvar: " + error.message);
     else {
       toast.success("Configurações salvas!");
       queryClient.invalidateQueries({ queryKey: ["site_settings"] });
@@ -108,9 +110,10 @@ const Admin = () => {
     const { error: uploadError } = await supabase.storage
       .from("site-assets")
       .upload(path, file, { upsert: true });
-    if (uploadError) { toast.error("Erro no upload"); return; }
+    if (uploadError) { toast.error("Erro no upload: " + uploadError.message); return; }
     const { data: { publicUrl } } = supabase.storage.from("site-assets").getPublicUrl(path);
-    await supabase.from("site_settings").update({ profile_image_url: publicUrl }).eq("id", settings.id);
+    const url = publicUrl + "?t=" + Date.now();
+    await supabase.from("site_settings").update({ profile_image_url: url }).eq("id", settings.id);
     toast.success("Foto atualizada!");
     queryClient.invalidateQueries({ queryKey: ["site_settings"] });
   };
@@ -123,12 +126,36 @@ const Admin = () => {
     const { error: uploadError } = await supabase.storage
       .from("site-assets")
       .upload(path, file, { upsert: true });
-    if (uploadError) { toast.error("Erro no upload"); return; }
+    if (uploadError) { toast.error("Erro no upload: " + uploadError.message); return; }
     const { data: { publicUrl } } = supabase.storage.from("site-assets").getPublicUrl(path);
-    await supabase.from("banners").update({ image_url: publicUrl }).eq("id", bannerId);
-    setBanners(prev => prev.map(b => b.id === bannerId ? { ...b, image_url: publicUrl } : b));
+    const url = publicUrl + "?t=" + Date.now();
+    const { error } = await supabase.from("banners").update({ image_url: url }).eq("id", bannerId);
+    if (error) { toast.error("Erro ao salvar banner: " + error.message); return; }
+    setBanners(prev => prev.map(b => b.id === bannerId ? { ...b, image_url: url } : b));
     toast.success("Banner atualizado!");
     queryClient.invalidateQueries({ queryKey: ["banners"] });
+  };
+
+  const handleBannerFieldUpdate = async (bannerId: string, field: string, value: any) => {
+    setBanners(prev => prev.map(b => b.id === bannerId ? { ...b, [field]: value } : b));
+  };
+
+  const handleSaveBanner = async (banner: any) => {
+    setBannerSaving(banner.id);
+    const { error } = await supabase
+      .from("banners")
+      .update({
+        link_url: banner.link_url,
+        link_type: banner.link_type,
+        is_active: banner.is_active,
+      })
+      .eq("id", banner.id);
+    if (error) toast.error("Erro ao salvar: " + error.message);
+    else {
+      toast.success("Banner salvo!");
+      queryClient.invalidateQueries({ queryKey: ["banners"] });
+    }
+    setBannerSaving(null);
   };
 
   const handleLogout = async () => {
@@ -155,14 +182,14 @@ const Admin = () => {
             <CardContent className="p-4 text-center">
               <Eye className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
               <p className="text-2xl font-bold text-foreground">{viewsToday}</p>
-              <p className="text-xs text-muted-foreground">Hoje</p>
+              <p className="text-xs text-muted-foreground">Visitas Hoje</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <Eye className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
               <p className="text-2xl font-bold text-foreground">{viewsTotal}</p>
-              <p className="text-xs text-muted-foreground">Total</p>
+              <p className="text-xs text-muted-foreground">Visitas Total</p>
             </CardContent>
           </Card>
         </div>
@@ -211,11 +238,11 @@ const Admin = () => {
                   <Input value={youtubeUrl} onChange={e => setYoutubeUrl(e.target.value)} placeholder="https://youtube.com/..." />
                 </div>
                 <div>
-                  <Label>WhatsApp URL</Label>
-                  <Input value={whatsappUrl} onChange={e => setWhatsappUrl(e.target.value)} placeholder="https://wa.me/5511..." />
+                  <Label>WhatsApp (suporte)</Label>
+                  <Input value={whatsappUrl} onChange={e => setWhatsappUrl(e.target.value)} placeholder="https://wa.me/5511999999999" />
                 </div>
                 <Button onClick={handleSaveProfile} disabled={saving} className="w-full">
-                  {saving ? "Salvando..." : "Salvar"}
+                  {saving ? "Salvando..." : "Salvar Perfil"}
                 </Button>
               </CardContent>
             </Card>
@@ -224,18 +251,62 @@ const Admin = () => {
           <TabsContent value="banners" className="mt-4 space-y-4">
             {banners.map((banner, i) => (
               <Card key={banner.id}>
-                <CardContent className="p-4">
-                  <p className="text-sm font-medium text-foreground mb-2">Banner {i + 1} — Posição {banner.position}</p>
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-foreground">Banner {i + 1} — Posição {banner.position}</p>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor={`active-${banner.id}`} className="text-xs text-muted-foreground">Ativo</Label>
+                      <Switch
+                        id={`active-${banner.id}`}
+                        checked={banner.is_active}
+                        onCheckedChange={(val) => handleBannerFieldUpdate(banner.id, "is_active", val)}
+                      />
+                    </div>
+                  </div>
+
                   {banner.image_url && (
-                    <img src={banner.image_url} alt={`Banner ${i + 1}`} className="w-full rounded-lg mb-3 aspect-[16/10] object-cover border border-border" />
+                    <img src={banner.image_url} alt={`Banner ${i + 1}`} className="w-full rounded-lg aspect-[16/10] object-cover border border-border" />
                   )}
+
                   <label className="cursor-pointer inline-block">
                     <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary text-sm text-foreground hover:bg-muted transition-colors">
                       <Upload className="w-4 h-4" /> Trocar imagem
                     </div>
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleBannerImageUpload(banner.id, e)} />
                   </label>
-                  <p className="text-xs text-muted-foreground mt-2">Link: {banner.link_url}</p>
+
+                  <div>
+                    <Label className="text-xs">Tipo de link</Label>
+                    <Select
+                      value={banner.link_type}
+                      onValueChange={(val) => handleBannerFieldUpdate(banner.id, "link_type", val)}
+                    >
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="page">Página interna</SelectItem>
+                        <SelectItem value="external">Link externo</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">URL do link</Label>
+                    <Input
+                      value={banner.link_url}
+                      onChange={(e) => handleBannerFieldUpdate(banner.id, "link_url", e.target.value)}
+                      placeholder={banner.link_type === "external" ? "https://..." : "/comunidade"}
+                    />
+                  </div>
+
+                  <Button
+                    size="sm"
+                    onClick={() => handleSaveBanner(banner)}
+                    disabled={bannerSaving === banner.id}
+                    className="w-full"
+                  >
+                    <Save className="w-4 h-4 mr-1" />
+                    {bannerSaving === banner.id ? "Salvando..." : "Salvar Banner"}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
