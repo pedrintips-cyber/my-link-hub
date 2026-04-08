@@ -222,11 +222,11 @@ const Comunidade = () => {
               </div>
 
               {/* CTA */}
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+              <Link to="/checkout">
                 <button className="w-full px-8 py-4 bg-[#00AEEF] hover:bg-[#0099d4] text-white font-bold rounded-xl text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,174,239,0.4)] hover:scale-105 mt-2">
                   GARANTIR MINHA VAGA
                 </button>
-              </a>
+              </Link>
 
               {/* Garantia inline */}
               <div className="flex items-center justify-center gap-2 pt-1">
@@ -299,6 +299,11 @@ const Comunidade = () => {
               ENTRAR AGORA
             </button>
           </a>
+          <Link to="/checkout" className="block mt-4">
+            <button className="px-12 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl text-lg transition-all duration-300 border border-white/20 hover:border-[#00AEEF]/50">
+              PAGAR VIA PIX
+            </button>
+          </Link>
         </div>
       </section>
 
