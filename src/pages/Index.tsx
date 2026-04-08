@@ -1,14 +1,14 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
 import { usePageView } from "@/hooks/usePageView";
+import bannerComunidade from "@/assets/banner-vip.jpg";
 import bannerMentoria from "@/assets/banner-mentoria.webp";
-import bannerPlanilha from "@/assets/banner-planilha.jpg";
-import bannerNetworkFree from "@/assets/banner-network-free.jpg";
+import bannerWhatsapp from "@/assets/banner-network-free.jpg";
 
 const links = [
-  { image: bannerPlanilha, href: "/comunidade" },
+  { image: bannerComunidade, href: "/comunidade" },
   { image: bannerMentoria, href: "/mentoria" },
-  { image: bannerNetworkFree, href: "https://chat.whatsapp.com/SEUGRUPO", external: true },
+  { image: bannerWhatsapp, href: "https://chat.whatsapp.com/SEUGRUPO", external: true },
 ];
 
 const Index = () => {
