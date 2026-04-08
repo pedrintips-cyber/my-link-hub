@@ -4,13 +4,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Loader2, Copy, CheckCircle, Shield } from "lucide-react";
+import { ArrowLeft, Loader2, Copy, CheckCircle, Shield, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { useEffect, useRef } from "react";
+
+const VIP_COMMUNITY_LINK = "https://chat.whatsapp.com/DydkCNVn9UIJ4ljLnnZVzX";
 
 const AMOUNT_CENTS = 9790;
 const PRODUCT_NAME = "PULSE CLUB — Acesso Vitalício";
 
-type CheckoutStep = "form" | "loading" | "pix";
+type CheckoutStep = "form" | "loading" | "pix" | "success";
 
 interface PixData {
   qr_code: string;
@@ -43,6 +46,27 @@ const Checkout = () => {
   const [pixData, setPixData] = useState<PixData | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Poll for payment status
+  useEffect(() => {
+    if (step === "pix" && pixData?.reference) {
+      pollingRef.current = setInterval(async () => {
+        const { data } = await supabase
+          .from("transactions")
+          .select("status")
+          .eq("reference", pixData.reference)
+          .maybeSingle();
+        if (data?.status === "approved") {
+          if (pollingRef.current) clearInterval(pollingRef.current);
+          setStep("success");
+        }
+      }, 5000);
+    }
+    return () => {
+      if (pollingRef.current) clearInterval(pollingRef.current);
+    };
+  }, [step, pixData?.reference]);
 
   const isValid =
     name.trim().length >= 3 &&
@@ -230,9 +254,31 @@ const Checkout = () => {
 
             <div className="pt-4 border-t border-white/10">
               <p className="text-white/50 text-sm">
-                Após o pagamento, você receberá o acesso no e-mail <strong className="text-white/80">{email}</strong>
+                Após o pagamento, o link de acesso à comunidade VIP aparecerá aqui automaticamente.
               </p>
+              <Loader2 className="w-4 h-4 text-primary animate-spin mx-auto mt-2" />
+              <p className="text-white/40 text-xs mt-1">Verificando pagamento...</p>
             </div>
+          </div>
+        )}
+
+        {step === "success" && (
+          <div className="space-y-6 text-center py-8">
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto" />
+            <div>
+              <h1 className="text-2xl font-black text-green-400">Pagamento Aprovado!</h1>
+              <p className="text-white/60 text-sm mt-2">Seu acesso à comunidade VIP está liberado.</p>
+            </div>
+            <a
+              href={VIP_COMMUNITY_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 w-full py-5 font-bold bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)]"
+            >
+              <ExternalLink className="w-5 h-5" />
+              Entrar na Comunidade VIP
+            </a>
+            <p className="text-white/40 text-xs">Clique no botão acima para acessar o grupo exclusivo</p>
           </div>
         )}
       </div>
