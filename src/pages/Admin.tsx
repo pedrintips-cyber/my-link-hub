@@ -193,7 +193,7 @@ const Admin = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-bold gold-text">Painel Admin</h1>
+          <h1 className="text-xl font-bold blue-text">Painel Admin</h1>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-1" /> Sair
           </Button>
