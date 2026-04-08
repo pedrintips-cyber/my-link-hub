@@ -1,0 +1,2 @@
+UPDATE site_settings SET whatsapp_url = 'https://chat.whatsapp.com/Gtv4TEOofm258ZtldohNUC' WHERE id = 'a5898508-e987-4351-9849-f9e1f00c7fe7';
+UPDATE banners SET link_url = 'https://chat.whatsapp.com/Gtv4TEOofm258ZtldohNUC' WHERE position = 3;
