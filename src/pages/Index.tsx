@@ -1,7 +1,7 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
 import { usePageView } from "@/hooks/usePageView";
-import bannerComunidade from "@/assets/banner-vip.jpg";
+import bannerComunidade from "@/assets/banner-comunidade.webp";
 import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerWhatsapp from "@/assets/banner-network-free.jpg";
 

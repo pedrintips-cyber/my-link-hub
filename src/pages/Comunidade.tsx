@@ -177,17 +177,63 @@ const Comunidade = () => {
 
       {/* OFERTA */}
       <section id="oferta" className="py-16 md:py-24">
-        <div className="max-w-lg mx-auto px-4">
-          <div className="relative p-8 rounded-2xl bg-gradient-to-b from-[#00AEEF]/10 to-transparent border border-[#00AEEF]/30 text-center">
+        <div className="max-w-xl mx-auto px-4">
+          <div className="relative rounded-2xl bg-gradient-to-b from-[#00AEEF]/10 to-[#050a18] border border-[#00AEEF]/30 overflow-hidden">
             <div className="absolute -inset-1 rounded-2xl bg-[#00AEEF]/5 blur-xl -z-10" />
-            <p className="text-white/40 line-through text-lg mb-1">De R$197</p>
-            <p className="text-4xl md:text-5xl font-black text-[#00AEEF] mb-2">R$97,90</p>
-            <p className="text-white/60 text-sm mb-6">Acesso vitalício, pagamento único.</p>
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              <button className="w-full px-8 py-4 bg-[#00AEEF] hover:bg-[#0099d4] text-white font-bold rounded-xl text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,174,239,0.4)] hover:scale-105">
-                GARANTIR MINHA VAGA
-              </button>
-            </a>
+            
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#00AEEF]/20 to-[#00AEEF]/5 px-6 py-4 border-b border-[#00AEEF]/20">
+              <p className="text-center text-sm font-bold text-[#00AEEF] uppercase tracking-wider flex items-center justify-center gap-2">
+                <Flame className="w-4 h-4" /> Oferta especial por tempo limitado
+              </p>
+            </div>
+
+            <div className="p-6 md:p-8 space-y-6">
+              {/* O que está incluso */}
+              <div>
+                <p className="text-sm font-semibold text-white/80 mb-3">Tudo que você recebe:</p>
+                <div className="space-y-2.5">
+                  {[
+                    "Acesso vitalício à comunidade PULSE CLUB",
+                    "Calls ao vivo semanais com estratégias reais",
+                    "9 módulos completos de marketing digital",
+                    "Ferramentas, templates e scripts prontos",
+                    "Networking com players ativos do mercado",
+                    "Suporte direto com a equipe",
+                    "Todas as atualizações futuras incluídas",
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <CheckCircle className="w-4 h-4 text-[#00AEEF] shrink-0 mt-0.5" />
+                      <span className="text-sm text-white/80">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Preço */}
+              <div className="text-center pt-2 pb-1 border-t border-white/5">
+                <p className="text-white/40 line-through text-base mb-1">De R$197,00</p>
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-lg text-white/50">por</span>
+                  <span className="text-5xl md:text-6xl font-black text-[#00AEEF]">R$97</span>
+                  <span className="text-2xl font-bold text-[#00AEEF]">,90</span>
+                </div>
+                <p className="text-white/50 text-xs mt-1">Pagamento único · Acesso vitalício</p>
+              </div>
+
+              {/* CTA */}
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <button className="w-full px-8 py-4 bg-[#00AEEF] hover:bg-[#0099d4] text-white font-bold rounded-xl text-lg transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,174,239,0.4)] hover:scale-105 mt-2">
+                  GARANTIR MINHA VAGA
+                </button>
+              </a>
+
+              {/* Garantia inline */}
+              <div className="flex items-center justify-center gap-2 pt-1">
+                <Shield className="w-4 h-4 text-green-400" />
+                <p className="text-xs text-white/50">Garantia de 15 dias ou seu dinheiro de volta</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
