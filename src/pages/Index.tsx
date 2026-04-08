@@ -1,63 +1,30 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
-import mentoriaIcon from "@/assets/mentoria-icon.png";
-import planilhaIcon from "@/assets/planilha-icon.png";
-import networkIcon from "@/assets/network-icon.png";
+import bannerMentoria from "@/assets/banner-mentoria.jpg";
+import bannerPlanilha from "@/assets/banner-planilha.jpg";
+import bannerNetworkFree from "@/assets/banner-network-free.jpg";
+import bannerVip from "@/assets/banner-vip.jpg";
 
 const links = [
-  {
-    title: "Mentoria Premium",
-    description: "Mentoria exclusiva + acesso ao grupo VIP de network com quem fez +6 dígitos",
-    image: mentoriaIcon,
-    href: "#",
-    badge: "🔥 MAIS VENDIDO",
-    isPaid: true,
-    price: "R$ 997,00",
-  },
-  {
-    title: "Planilha Personalizada",
-    description: "Controle total das suas finanças e métricas do seu negócio digital",
-    image: planilhaIcon,
-    href: "#",
-    isPaid: true,
-    price: "R$ 97,00",
-  },
-  {
-    title: "Grupo de Network FREE",
-    description: "Entre no nosso grupo gratuito do WhatsApp e conecte-se com empreendedores",
-    image: networkIcon,
-    href: "#",
-    badge: "GRÁTIS",
-  },
-  {
-    title: "Grupo VIP Network",
-    description: "Acesso exclusivo ao grupo privado com empreendedores de +6 dígitos",
-    image: networkIcon,
-    href: "#",
-    badge: "EXCLUSIVO",
-    isPaid: true,
-    price: "Incluído na Mentoria",
-  },
+  { image: bannerMentoria, href: "#" },
+  { image: bannerPlanilha, href: "#" },
+  { image: bannerNetworkFree, href: "#" },
+  { image: bannerVip, href: "#" },
 ];
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-lg mx-auto px-4 py-8 pb-16">
+      <div className="max-w-lg mx-auto px-4 py-4 pb-16">
         <ProfileHeader />
 
-        {/* Section title */}
-        <div className="mt-10 mb-5 animate-fade-up animate-fade-up-delay-1">
-          <h2 className="text-lg font-bold gold-text">Meus Links</h2>
-        </div>
-
         {/* Links */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5 mt-10">
           {links.map((link, i) => (
             <LinkCard
-              key={link.title}
+              key={i}
               {...link}
-              animationDelay={`animate-fade-up-delay-${Math.min(i + 2, 4)}`}
+              animationDelay={`animate-fade-up-delay-${Math.min(i + 1, 4)}`}
             />
           ))}
         </div>
