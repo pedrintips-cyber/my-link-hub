@@ -6,8 +6,8 @@ import bannerPlanilha from "@/assets/banner-planilha.jpg";
 import bannerNetworkFree from "@/assets/banner-network-free.jpg";
 
 const links = [
-  { image: bannerMentoria, href: "/comunidade" },
-  { image: bannerPlanilha, href: "/mentoria" },
+  { image: bannerPlanilha, href: "/comunidade" },
+  { image: bannerMentoria, href: "/mentoria" },
   { image: bannerNetworkFree, href: "https://chat.whatsapp.com/SEUGRUPO", external: true },
 ];
 
