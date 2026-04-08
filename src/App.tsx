@@ -10,7 +10,9 @@ import Mentoria from "./pages/Mentoria";
 import AdminLogin from "./pages/AdminLogin";
 import Admin from "./pages/Admin";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: { queries: { retry: 1 } },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
