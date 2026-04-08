@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { LogOut, Eye, Image, Settings, Upload, Save } from "lucide-react";
+import { LogOut, Eye, Image, Settings, Upload, Save, ShoppingCart } from "lucide-react";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -37,6 +37,10 @@ const Admin = () => {
   // Views state
   const [viewsToday, setViewsToday] = useState(0);
   const [viewsTotal, setViewsTotal] = useState(0);
+
+  // Transactions state
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [txLoading, setTxLoading] = useState(true);
 
   useEffect(() => {
     if (!adminLoading && !isAdmin) navigate("/admin/login");
@@ -63,6 +67,25 @@ const Admin = () => {
   }, [isAdmin]);
 
   useEffect(() => { loadBanners(); }, [loadBanners]);
+
+  // Load transactions
+  useEffect(() => {
+    if (!isAdmin) return;
+    supabase
+      .from("transactions")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50)
+      .then(({ data }) => {
+        setTransactions(data || []);
+        setTxLoading(false);
+      });
+  }, [isAdmin]);
+
+  const approvedCount = transactions.filter(t => t.status === "approved").length;
+  const approvedTotal = transactions
+    .filter(t => t.status === "approved")
+    .reduce((sum, t) => sum + (t.amount || 0), 0);
 
   // Load views
   useEffect(() => {
@@ -174,6 +197,20 @@ const Admin = () => {
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-1" /> Sair
           </Button>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
+              <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
+              <p className="text-xs text-muted-foreground">Vendas</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
+              <p className="text-2xl font-bold text-foreground">R$ {(approvedTotal / 100).toFixed(2).replace(".", ",")}</p>
+              <p className="text-xs text-muted-foreground">Faturamento</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Stats */}
@@ -198,6 +235,7 @@ const Admin = () => {
           <TabsList className="w-full">
             <TabsTrigger value="profile" className="flex-1"><Settings className="w-4 h-4 mr-1" /> Perfil</TabsTrigger>
             <TabsTrigger value="banners" className="flex-1"><Image className="w-4 h-4 mr-1" /> Banners</TabsTrigger>
+            <TabsTrigger value="vendas" className="flex-1"><ShoppingCart className="w-4 h-4 mr-1" /> Vendas</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="mt-4 space-y-4">
@@ -313,6 +351,37 @@ const Admin = () => {
             {banners.length === 0 && !bannersLoading && (
               <p className="text-sm text-muted-foreground text-center py-8">Nenhum banner cadastrado.</p>
             )}
+          </TabsContent>
+
+          <TabsContent value="vendas" className="mt-4 space-y-3">
+            {transactions.length === 0 && !txLoading && (
+              <p className="text-sm text-muted-foreground text-center py-8">Nenhuma transação ainda.</p>
+            )}
+            {transactions.map((tx) => (
+              <Card key={tx.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-medium text-foreground">{tx.customer_name}</p>
+                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                      tx.status === "approved" ? "bg-green-500/20 text-green-400" :
+                      tx.status === "pending" ? "bg-yellow-500/20 text-yellow-400" :
+                      tx.status === "refunded" ? "bg-blue-500/20 text-blue-400" :
+                      "bg-red-500/20 text-red-400"
+                    }`}>
+                      {tx.status === "approved" ? "Aprovado" :
+                       tx.status === "pending" ? "Pendente" :
+                       tx.status === "refunded" ? "Reembolsado" :
+                       tx.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">{tx.customer_email}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-sm font-bold text-foreground">R$ {(tx.amount / 100).toFixed(2).replace(".", ",")}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(tx.created_at).toLocaleString("pt-BR")}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
         </Tabs>
       </div>
