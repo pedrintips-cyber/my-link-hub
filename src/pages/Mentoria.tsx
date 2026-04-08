@@ -94,8 +94,8 @@ const Mentoria = () => {
   };
 
   const handleFinish = () => {
-    const base = whatsappUrl.includes("wa.me") ? whatsappUrl : "https://wa.me/";
-    const url = `${base}${base.includes("?") ? "&" : "?"}text=${buildWhatsAppMessage()}`;
+    const phone = "5511977937998";
+    const url = `https://wa.me/${phone}?text=${buildWhatsAppMessage()}`;
     window.open(url, "_blank");
   };
 
