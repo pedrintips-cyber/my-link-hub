@@ -8,39 +8,40 @@ export function useAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) {
-        const { data } = await supabase
-          .from("user_roles" as any)
-          .select("role")
-          .eq("user_id", u.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        setIsAdmin(!!data);
-      } else {
-        setIsAdmin(false);
+    let cancelled = false;
+
+    const checkAdmin = async (u: User | null) => {
+      if (!u) {
+        if (!cancelled) {
+          setUser(null);
+          setIsAdmin(false);
+          setLoading(false);
+        }
+        return;
       }
-      setLoading(false);
+      if (!cancelled) setUser(u);
+      const { data } = await supabase.rpc("has_role", {
+        _user_id: u.id,
+        _role: "admin",
+      });
+      if (!cancelled) {
+        setIsAdmin(!!data);
+        setLoading(false);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      checkAdmin(session?.user ?? null);
     });
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      const u = session?.user ?? null;
-      setUser(u);
-      if (u) {
-        const { data } = await supabase
-          .from("user_roles" as any)
-          .select("role")
-          .eq("user_id", u.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        setIsAdmin(!!data);
-      }
-      setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkAdmin(session?.user ?? null);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return { user, isAdmin, loading };
