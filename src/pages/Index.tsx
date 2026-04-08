@@ -1,18 +1,19 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
+import { usePageView } from "@/hooks/usePageView";
 import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerPlanilha from "@/assets/banner-planilha.jpg";
 import bannerNetworkFree from "@/assets/banner-network-free.jpg";
-import bannerVip from "@/assets/banner-vip.jpg";
 
 const links = [
-  { image: bannerMentoria, href: "#" },
-  { image: bannerPlanilha, href: "#" },
-  { image: bannerNetworkFree, href: "#" },
-  { image: bannerVip, href: "#" },
+  { image: bannerMentoria, href: "/comunidade" },
+  { image: bannerPlanilha, href: "/mentoria" },
+  { image: bannerNetworkFree, href: "https://chat.whatsapp.com/SEUGRUPO", external: true },
 ];
 
 const Index = () => {
+  usePageView("/");
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-lg mx-auto px-4 py-4 pb-16">
