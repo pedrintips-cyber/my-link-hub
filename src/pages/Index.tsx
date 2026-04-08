@@ -1,6 +1,6 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
-import bannerMentoria from "@/assets/banner-mentoria.jpg";
+import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerPlanilha from "@/assets/banner-planilha.jpg";
 import bannerNetworkFree from "@/assets/banner-network-free.jpg";
 import bannerVip from "@/assets/banner-vip.jpg";
