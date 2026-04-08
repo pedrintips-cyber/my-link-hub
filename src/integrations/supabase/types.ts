@@ -101,6 +101,57 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          customer_document: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          expires_at: string | null
+          id: string
+          paradise_id: string | null
+          qr_code: string | null
+          qr_code_base64: string | null
+          reference: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          customer_document: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string
+          expires_at?: string | null
+          id?: string
+          paradise_id?: string | null
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          reference: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          customer_document?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string
+          expires_at?: string | null
+          id?: string
+          paradise_id?: string | null
+          qr_code?: string | null
+          qr_code_base64?: string | null
+          reference?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

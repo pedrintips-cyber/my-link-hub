@@ -9,6 +9,7 @@ import Comunidade from "./pages/Comunidade";
 import Mentoria from "./pages/Mentoria";
 import AdminLogin from "./pages/AdminLogin";
 import Admin from "./pages/Admin";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1 } },
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/mentoria" element={<Mentoria />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/checkout" element={<Checkout />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
