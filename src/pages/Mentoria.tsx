@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, ArrowRight, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import bannerMentoria from "@/assets/banner-mentoria.webp";
 
 interface Question {
   id: string;
@@ -72,14 +72,13 @@ const questions: Question[] = [
 const Mentoria = () => {
   usePageView("/mentoria");
   const { data: settings } = useSiteSettings();
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(-1); // -1 = banner/intro
   const [answers, setAnswers] = useState<Record<string, string>>({});
 
-  const currentQ = questions[step];
+  const currentQ = step >= 0 ? questions[step] : null;
   const isLast = step === questions.length - 1;
   const whatsappUrl = settings?.whatsapp_url || "#";
-
-  const canProceed = answers[currentQ?.id]?.trim();
+  const canProceed = currentQ ? answers[currentQ.id]?.trim() : false;
 
   const handleNext = () => {
     if (isLast) return;
@@ -100,86 +99,166 @@ const Mentoria = () => {
     window.open(url, "_blank");
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-lg mx-auto px-4 py-6 pb-16">
-        <Link to="/" className="inline-flex items-center text-muted-foreground hover:text-foreground text-sm mb-6 transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
-        </Link>
+  // Banner/Intro screen
+  if (step === -1) {
+    return (
+      <div className="min-h-screen bg-[#050a18] flex flex-col">
+        <div className="px-4 pt-4">
+          <Link to="/" className="inline-flex items-center text-blue-300/70 hover:text-blue-200 text-sm transition-colors">
+            <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+          </Link>
+        </div>
 
-        <div className="text-center mb-8 animate-fade-up">
-          <h1 className="text-2xl font-black gold-text mb-2">Mentoria Individual</h1>
-          <p className="text-muted-foreground text-sm">
-            Responda algumas perguntas para que eu entenda seu perfil
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
+          <div className="w-full max-w-md">
+            <img
+              src={bannerMentoria}
+              alt="Mentoria Individual 1:1"
+              className="w-full rounded-2xl shadow-2xl shadow-blue-500/10 mb-8"
+            />
+
+            <div className="text-center space-y-4">
+              <h1 className="text-2xl sm:text-3xl font-black text-white">
+                Acompanhamento{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+                  Individual 1:1
+                </span>
+              </h1>
+              <p className="text-blue-200/60 text-sm sm:text-base leading-relaxed">
+                Responda algumas perguntas rápidas para que eu conheça seu perfil e te direcione da melhor forma.
+              </p>
+
+              <Button
+                onClick={() => setStep(0)}
+                className="w-full py-6 text-base font-bold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-300 hover:shadow-blue-500/40 hover:scale-[1.02]"
+              >
+                Começar Quiz <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#050a18] flex flex-col">
+      <div className="flex-1 w-full max-w-lg mx-auto px-4 py-6 pb-24 flex flex-col">
+        {/* Header */}
+        <button
+          onClick={() => setStep(step > 0 ? step - 1 : -1)}
+          className="inline-flex items-center text-blue-300/70 hover:text-blue-200 text-sm transition-colors mb-6 self-start"
+        >
+          <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
+        </button>
+
+        <div className="text-center mb-6">
+          <h1 className="text-xl sm:text-2xl font-black text-white mb-1">
+            Mentoria{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">
+              Individual
+            </span>
+          </h1>
+          <p className="text-blue-200/50 text-xs sm:text-sm">
+            Pergunta {step + 1} de {questions.length}
           </p>
         </div>
 
         {/* Progress bar */}
-        <div className="w-full bg-secondary rounded-full h-1.5 mb-8">
+        <div className="w-full bg-blue-950/50 rounded-full h-2 mb-8 overflow-hidden">
           <div
-            className="gold-gradient h-1.5 rounded-full transition-all duration-500"
+            className="bg-gradient-to-r from-blue-600 to-cyan-400 h-2 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${((step + 1) / questions.length) * 100}%` }}
           />
         </div>
 
-        {/* Question */}
-        <Card className="animate-fade-up">
-          <CardContent className="p-6">
-            <p className="text-sm font-semibold text-foreground mb-4">
-              {step + 1}. {currentQ.question}
+        {/* Step indicators */}
+        <div className="flex items-center justify-center gap-2 mb-8">
+          {questions.map((_, i) => (
+            <div
+              key={i}
+              className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                i < step
+                  ? "bg-blue-600 text-white"
+                  : i === step
+                  ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white scale-110 shadow-lg shadow-blue-500/30"
+                  : "bg-blue-950/50 text-blue-400/40 border border-blue-800/30"
+              }`}
+            >
+              {i < step ? <CheckCircle2 className="w-4 h-4" /> : i + 1}
+            </div>
+          ))}
+        </div>
+
+        {/* Question Card */}
+        <div className="flex-1">
+          <div className="bg-blue-950/30 border border-blue-800/20 rounded-2xl p-5 sm:p-6 shadow-xl shadow-blue-900/10">
+            <p className="text-base sm:text-lg font-semibold text-white mb-5">
+              {currentQ!.question}
             </p>
 
-            {currentQ.type === "radio" && currentQ.options && (
+            {currentQ!.type === "radio" && currentQ!.options && (
               <RadioGroup
-                value={answers[currentQ.id] || ""}
-                onValueChange={(val) => setAnswers({ ...answers, [currentQ.id]: val })}
+                value={answers[currentQ!.id] || ""}
+                onValueChange={(val) => setAnswers({ ...answers, [currentQ!.id]: val })}
                 className="space-y-3"
               >
-                {currentQ.options.map((opt, i) => (
-                  <div key={i} className="flex items-center space-x-3 p-3 rounded-lg bg-secondary/50 border border-border hover:border-primary/30 transition-colors">
-                    <RadioGroupItem value={opt} id={`${currentQ.id}-${i}`} />
-                    <Label htmlFor={`${currentQ.id}-${i}`} className="text-sm cursor-pointer flex-1">{opt}</Label>
+                {currentQ!.options.map((opt, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center space-x-3 p-3.5 sm:p-4 rounded-xl border transition-all duration-200 cursor-pointer ${
+                      answers[currentQ!.id] === opt
+                        ? "bg-blue-600/20 border-blue-500/50 shadow-md shadow-blue-500/10"
+                        : "bg-blue-950/40 border-blue-800/20 hover:border-blue-700/40 hover:bg-blue-900/30"
+                    }`}
+                  >
+                    <RadioGroupItem
+                      value={opt}
+                      id={`${currentQ!.id}-${i}`}
+                      className="border-blue-500 text-blue-400"
+                    />
+                    <Label
+                      htmlFor={`${currentQ!.id}-${i}`}
+                      className="text-sm sm:text-base cursor-pointer flex-1 text-blue-100/90 leading-snug"
+                    >
+                      {opt}
+                    </Label>
                   </div>
                 ))}
               </RadioGroup>
             )}
 
-            {currentQ.type === "input" && (
+            {currentQ!.type === "input" && (
               <Input
-                value={answers[currentQ.id] || ""}
-                onChange={(e) => setAnswers({ ...answers, [currentQ.id]: e.target.value })}
-                placeholder={currentQ.placeholder}
-                className="mt-2"
+                value={answers[currentQ!.id] || ""}
+                onChange={(e) => setAnswers({ ...answers, [currentQ!.id]: e.target.value })}
+                placeholder={currentQ!.placeholder}
+                className="mt-2 bg-blue-950/50 border-blue-800/30 text-white placeholder:text-blue-400/40 focus:border-blue-500 focus:ring-blue-500/20 rounded-xl py-6 text-base"
               />
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Navigation */}
-        <div className="flex gap-3 mt-6">
-          {step > 0 && (
-            <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
-              <ArrowLeft className="w-4 h-4 mr-1" /> Voltar
-            </Button>
-          )}
+        <div className="mt-6 space-y-3">
           {!isLast ? (
-            <Button onClick={handleNext} disabled={!canProceed} className="flex-1">
-              Próxima <ArrowRight className="w-4 h-4 ml-1" />
+            <Button
+              onClick={handleNext}
+              disabled={!canProceed}
+              className="w-full py-6 text-base font-bold bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white rounded-xl shadow-lg shadow-blue-500/25 transition-all duration-300 hover:shadow-blue-500/40 disabled:opacity-40 disabled:shadow-none"
+            >
+              Próxima <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           ) : (
             <Button
               onClick={handleFinish}
               disabled={!canProceed}
-              className="flex-1 gold-gradient text-primary-foreground hover:opacity-90"
+              className="w-full py-6 text-base font-bold bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white rounded-xl shadow-lg shadow-green-500/25 transition-all duration-300 hover:shadow-green-500/40 disabled:opacity-40 disabled:shadow-none"
             >
-              <MessageCircle className="w-4 h-4 mr-1" /> Falar no WhatsApp
+              <MessageCircle className="w-5 h-5 mr-2" /> Falar no WhatsApp
             </Button>
           )}
         </div>
-
-        <p className="text-xs text-muted-foreground text-center mt-4">
-          Pergunta {step + 1} de {questions.length}
-        </p>
       </div>
     </div>
   );
