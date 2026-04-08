@@ -214,7 +214,7 @@ const Admin = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <Card>
             <CardContent className="p-4 text-center">
               <Eye className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
