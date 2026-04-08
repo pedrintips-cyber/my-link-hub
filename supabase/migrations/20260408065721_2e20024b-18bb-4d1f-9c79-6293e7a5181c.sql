@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Anyone can check transaction status by reference" ON public.transactions;

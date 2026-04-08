@@ -8,7 +8,7 @@ import { ArrowLeft, Loader2, Copy, CheckCircle, Shield, ExternalLink } from "luc
 import { toast } from "sonner";
 import { useEffect, useRef } from "react";
 
-const VIP_COMMUNITY_LINK = "https://chat.whatsapp.com/DydkCNVn9UIJ4ljLnnZVzX";
+
 
 const AMOUNT_CENTS = 9790;
 const PRODUCT_NAME = "PULSE CLUB — Acesso Vitalício";
@@ -46,21 +46,23 @@ const Checkout = () => {
   const [pixData, setPixData] = useState<PixData | null>(null);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
+  const [vipLink, setVipLink] = useState("");
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Poll for payment status
+  // Poll for payment status via secure edge function
   useEffect(() => {
     if (step === "pix" && pixData?.reference) {
       pollingRef.current = setInterval(async () => {
-        const { data } = await supabase
-          .from("transactions")
-          .select("status")
-          .eq("reference", pixData.reference)
-          .maybeSingle();
-        if (data?.status === "approved") {
-          if (pollingRef.current) clearInterval(pollingRef.current);
-          setStep("success");
-        }
+        try {
+          const { data } = await supabase.functions.invoke("get-vip-link", {
+            body: { reference: pixData.reference },
+          });
+          if (data?.approved && data?.link) {
+            if (pollingRef.current) clearInterval(pollingRef.current);
+            setVipLink(data.link);
+            setStep("success");
+          }
+        } catch {}
       }, 5000);
     }
     return () => {
@@ -269,15 +271,17 @@ const Checkout = () => {
               <h1 className="text-2xl font-black text-green-400">Pagamento Aprovado!</h1>
               <p className="text-white/60 text-sm mt-2">Seu acesso à comunidade VIP está liberado.</p>
             </div>
-            <a
-              href={VIP_COMMUNITY_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 w-full py-5 font-bold bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)]"
-            >
-              <ExternalLink className="w-5 h-5" />
-              Entrar na Comunidade VIP
-            </a>
+            {vipLink && (
+              <a
+                href={vipLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 w-full py-5 font-bold bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(34,197,94,0.4)]"
+              >
+                <ExternalLink className="w-5 h-5" />
+                Entrar na Comunidade VIP
+              </a>
+            )}
             <p className="text-white/40 text-xs">Clique no botão acima para acessar o grupo exclusivo</p>
           </div>
         )}
