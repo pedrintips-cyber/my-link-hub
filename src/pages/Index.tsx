@@ -2,6 +2,7 @@ import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
 import { usePageView } from "@/hooks/usePageView";
 import { useBanners } from "@/hooks/useBanners";
+import { useSiteSettings } from "@/hooks/useSiteSettings";
 import bannerComunidade from "@/assets/banner-comunidade.webp";
 import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerWhatsapp from "@/assets/banner-network-free.jpg";
@@ -15,12 +16,20 @@ const fallbackImages: Record<number, string> = {
 const Index = () => {
   usePageView("/");
   const { data: banners } = useBanners();
+  const { data: settings } = useSiteSettings();
 
-  const links = (banners || []).map((b) => ({
-    image: b.image_url || fallbackImages[b.position] || bannerWhatsapp,
-    href: b.link_url || "#",
-    external: b.link_type === "external",
-  }));
+  const links = (banners || []).map((b) => {
+    const bannerHref =
+      b.position === 3 && (!b.link_url || b.link_url === "#" || b.link_url === "#whatsapp")
+        ? settings?.whatsapp_url || "#"
+        : b.link_url || "#";
+
+    return {
+      image: b.image_url || fallbackImages[b.position] || bannerWhatsapp,
+      href: bannerHref,
+      external: b.link_type === "external",
+    };
+  });
 
   // Fallback if no banners in DB yet
   const displayLinks = links.length > 0 ? links : [

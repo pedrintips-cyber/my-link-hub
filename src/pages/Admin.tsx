@@ -197,20 +197,6 @@ const Admin = () => {
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut className="w-4 h-4 mr-1" /> Sair
           </Button>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
-              <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
-              <p className="text-xs text-muted-foreground">Vendas</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4 text-center">
-              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
-              <p className="text-2xl font-bold text-foreground">R$ {(approvedTotal / 100).toFixed(2).replace(".", ",")}</p>
-              <p className="text-xs text-muted-foreground">Faturamento</p>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Stats */}
@@ -227,6 +213,20 @@ const Admin = () => {
               <Eye className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
               <p className="text-2xl font-bold text-foreground">{viewsTotal}</p>
               <p className="text-xs text-muted-foreground">Visitas Total</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
+              <p className="text-2xl font-bold text-foreground">{approvedCount}</p>
+              <p className="text-xs text-muted-foreground">Vendas</p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-4 text-center">
+              <ShoppingCart className="w-5 h-5 mx-auto mb-1 text-muted-foreground" />
+              <p className="text-2xl font-bold text-foreground">R$ {(approvedTotal / 100).toFixed(2).replace(".", ",")}</p>
+              <p className="text-xs text-muted-foreground">Faturamento</p>
             </CardContent>
           </Card>
         </div>
