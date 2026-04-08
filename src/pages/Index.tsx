@@ -1,18 +1,33 @@
 import ProfileHeader from "@/components/ProfileHeader";
 import LinkCard from "@/components/LinkCard";
 import { usePageView } from "@/hooks/usePageView";
+import { useBanners } from "@/hooks/useBanners";
 import bannerComunidade from "@/assets/banner-comunidade.webp";
 import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerWhatsapp from "@/assets/banner-network-free.jpg";
 
-const links = [
-  { image: bannerComunidade, href: "/comunidade" },
-  { image: bannerMentoria, href: "/mentoria" },
-  { image: bannerWhatsapp, href: "https://chat.whatsapp.com/SEUGRUPO", external: true },
-];
+const fallbackImages: Record<number, string> = {
+  1: bannerComunidade,
+  2: bannerMentoria,
+  3: bannerWhatsapp,
+};
 
 const Index = () => {
   usePageView("/");
+  const { data: banners } = useBanners();
+
+  const links = (banners || []).map((b) => ({
+    image: b.image_url || fallbackImages[b.position] || bannerWhatsapp,
+    href: b.link_url || "#",
+    external: b.link_type === "external",
+  }));
+
+  // Fallback if no banners in DB yet
+  const displayLinks = links.length > 0 ? links : [
+    { image: bannerComunidade, href: "/comunidade", external: false },
+    { image: bannerMentoria, href: "/mentoria", external: false },
+    { image: bannerWhatsapp, href: "#", external: true },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
@@ -21,7 +36,7 @@ const Index = () => {
 
         {/* Links */}
         <div className="flex flex-col gap-5 mt-10">
-          {links.map((link, i) => (
+          {displayLinks.map((link, i) => (
             <LinkCard
               key={i}
               {...link}
