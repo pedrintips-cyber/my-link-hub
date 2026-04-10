@@ -8,9 +8,9 @@ import bannerMentoria from "@/assets/banner-mentoria.webp";
 import bannerWhatsapp from "@/assets/banner-network-free.jpg";
 
 const fallbackImages: Record<number, string> = {
-  1: bannerComunidade,
-  2: bannerMentoria,
-  3: bannerWhatsapp,
+  1: bannerWhatsapp,
+  2: bannerComunidade,
+  3: bannerMentoria,
 };
 
 const Index = () => {
